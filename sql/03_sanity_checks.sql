@@ -240,6 +240,51 @@ Limit 20;
 -- WHY: Understands how returns affect revenue and order counts.
 -- RESULT: Shows the scale and impact of returned transactions.
 
+
+-- whether returns are a rare exception or a frequent event.
+SELECT
+    COUNT(*) AS return_rows,
+    (SELECT COUNT(*) FROM staging.raw_online_retail) AS total_rows
+FROM staging.raw_online_retail
+WHERE quantity < 0;
+
+SELECT sum(quantity * unit_price) as negative_total_revenue
+FROM staging.raw_online_retail
+WHERE quantity < 0;
+
+SELECT distinct invoice_no as unique_canceled_transaction
+FROM staging.raw_online_retail
+WHERE invoice_no like 'C%';
+
+-- WHAT: Calculates the percentage of orders that contain at least one return line.
+-- WHY: Shows how common returns are at the order level (penetration rate).
+-- RESULT: One number = % of orders affected by returns.
+
+-- Calculate return penetration
+SELECT
+    100.0 * COUNT(DISTINCT CASE WHEN quantity < 0 THEN invoice_no END)
+          / COUNT(DISTINCT invoice_no) AS pct_orders_with_returns
+FROM staging.raw_online_retail;
+
+SELECT
+    invoice_no,
+    SUM(quantity * unit_price) AS return_revenue
+FROM staging.raw_online_retail
+WHERE quantity < 0
+GROUP BY invoice_no
+ORDER BY return_revenue ASC
+LIMIT 20;
+
+SELECT
+    stock_code,
+    description,
+    SUM(quantity) AS total_return_qty
+FROM staging.raw_online_retail
+WHERE quantity < 0
+GROUP BY stock_code, description
+ORDER BY total_return_qty ASC
+LIMIT 20;
+
 -- 12) Cancellation analysis
 -- WHAT: Separates cancelled entities from normal ones.
 -- WHY: Prevents cancelled transactions from polluting KPIs.
