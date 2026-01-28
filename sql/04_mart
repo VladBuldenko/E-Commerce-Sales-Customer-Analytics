@@ -1,0 +1,51 @@
+/* =============================================================================
+DESCRIPTION: Create the Star Schema (Analytical Layer) in the 'mart' schema.
+WHY: To transform flat, messy staging data into an organized structure 
+     optimized for Power BI and fast analytical queries.
+RESULT: A set of clean dimension tables and a central fact table.
+=============================================================================
+*/
+
+-- 1. Create Product Dimension
+-- WHY: To have a single source of truth for products. 
+--      Handles inconsistencies in descriptions and improves performance.
+-- RESULT: A table with a unique 'product_key' for every unique 'stock_code'.
+
+CREATE Table if not EXISTS mart.dim_products (
+    product_key serial primary key,
+    stock_code varchar(50) not null,
+    description varchar(250)
+);
+
+-- 2. Create Customer Dimension
+-- WHY: To group transactions by customer and geography. 
+--      Allows us to handle missing Customer IDs by mapping them to a default record.
+-- RESULT: A unique list of customers with their associated country.
+
+CREATE table if not exists mart.dim_customers (
+    customer_key serial primary key,
+    customer_id varchar(50),
+    country varchar(100)
+);
+
+-- 3. Create Sales Fact Table
+-- WHY: This is the central table for all quantitative metrics (Quantity, Revenue).
+--      It uses numeric keys (FK) to link to dimensions instead of heavy text.
+-- RESULT: A high-performance table containing every transaction line-item.
+
+CREATE table if not exists mart.fct_sales (
+    sales_key serial primary key,
+    date_id timestamp,
+    product_key int,
+    customer_key int,
+    invoice_no varchar(20),
+    quantity integer,
+    unit_price numeric(10,2),
+
+    -- Defining Foreign Key Constraints
+    -- WHY: To ensure Referential Integrity. We cannot have a sale for a 
+    --      product that doesn't exist in our dim_products table.
+    constraint fk_product foreign key (product_key) references mart.dim_products(product_key),
+    constraint fk_customer foreign key (customer_key) references mart.dim_customers(customer_key) 
+);
+

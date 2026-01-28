@@ -1,6 +1,8 @@
 📊 E-Commerce Sales & Customer Analytics (PostgreSQL + Power BI)
 📌 Project Overview
 
+https://www.kaggle.com/datasets/ulrikthygepedersen/online-retail-dataset
+
 This project demonstrates an end-to-end data analytics workflow using a realistic European e-commerce dataset.
 The goal is to show how raw transactional data can be ingested, validated, transformed, and prepared for business analysis and visualization.
 
