@@ -49,3 +49,15 @@ CREATE table if not exists mart.fct_sales (
     constraint fk_customer foreign key (customer_key) references mart.dim_customers(customer_key) 
 );
 
+-- 4. Create Monthly Sales Performance Mart
+-- WHY: To provide a clean, aggregated data source for business dashboards.
+--      It removes time-level detail (truncating to month) and filters out negative 
+--      revenue to focus on successful sales performance.
+-- RESULT: A lightweight table with unique monthly revenue and order counts per country.
+
+CREATE TABLE mart.fct_monthly_sales (
+    sale_month date,
+    country varchar(100),
+    total_revenue numeric(15,2),
+    total_orders integer
+);
