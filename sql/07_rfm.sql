@@ -28,7 +28,7 @@ rfm_scores as (
         customer_key,
         NTILE(3) Over (Order By recency DESC) as r_score,
         NTILE(3) Over (Order By unique_invoice_no ASC) as f_score,
-        NTILE(3) Over (Order By recency ASC) as m_score
+        NTILE(3) Over (Order By mart_revenue ASC) as m_score
     FROM rfm_metrics
 )
 SELECT 
