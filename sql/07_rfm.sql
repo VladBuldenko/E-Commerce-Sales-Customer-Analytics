@@ -31,6 +31,16 @@ rfm_scores as (
         NTILE(3) Over (Order By mart_revenue ASC) as m_score
     FROM rfm_metrics
 )
+/* RFM METRICS DEFINITION:
+   - RECENCY (R): Days since last purchase. 3 = Active/Recent, 1 = Churned/Old.
+   - FREQUENCY (F): Total number of orders. 3 = Loyal/Frequent, 1 = One-timer.
+   - MONETARY (M): Total revenue spent. 3 = VIP/Big Spender, 1 = Low Budget.
+
+   WHY THIS MATTERS:
+   We use NTILE(3) to split customers into 3 equal groups.
+   Combined, they form an RFM_CODE (e.g., '333' is a Champion).
+   This allows marketing to target 'At Risk' (R=1) differently than 'New' (R=3, F=1) customers.
+*/
 SELECT 
     customer_key,
     r_score,
